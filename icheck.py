@@ -1,4 +1,4 @@
-import httplib
+import http.client
 import time
 import sqlite3
 import os
@@ -55,40 +55,40 @@ tweet2send = ''
 while True:
 	#testing Check
 	if testOut == True:
-		print '\n'
-		print '=::Testing Output::='
-		print 'Downcount: '+str(downCount)
-		print 'Upcount: '+str(upCount)
-		print 'Tweet Length: '+str(len(tweet2send))
-		print '=::Testing Output::='
-		print '\n'
+		print('\n')
+		print('=::Testing Output::=')
+		print('Downcount: '+str(downCount))
+		print('Upcount: '+str(upCount))
+		print('Tweet Length: '+str(len(tweet2send)))
+		print('=::Testing Output::=')
+		print('\n')
 
 	#if tweet var is set and inet has been up long enought send tweet
-	if len(tweet2send)>0 and upCount >= 5:
-		print '\n'
-		print 'The Following Tweet was posted to twitter sucessfully:'
-		print tweet2send
+	if len(tweet2send)>0 and upCount >= cfg.tweetUp:
+		print('\n')
+		print('The Following Tweet was posted to twitter sucessfully:')
+		print(tweet2send)
 		t.statuses.update(status=tweet2send)
-		print '\n'
+		print('\n')
 		tweet2send = ''
 
-	con = httplib.HTTPConnection("www.google.com")
+	con = http.client.HTTPConnection("www.google.com")
 	try:
 		con.request("HEAD", "/")
 		upCount += 2
 
-		if upCount == 2: print '\n'
+		if upCount == 2: print('\n')
 
 		#converting seconds to proper time value for terminal output
 		if upCount <= 60:
 			upTime = str(upCount)+' Seconds!'
 		elif upCount > 60 and upCount < 3600:
-			upTime = str(round(upCount/60,2))+' Minutes!'
+			upTime = str(round(float(upCount)/60,2))+' Minutes!'
 		elif upCount >= 3600:
-			upTime = str(round(upCount/3600,2))+' Hours!'
+			upTime = str(round(float(upCount)/3600,2))+' Hours!'
 
-		print 'Internet Is Up and has been up for the last '+upTime
-		if downCount > 2:
+		print('Internet Is Up and has been up for the last '+upTime)
+		if downCount > cfg.downLog:
 			timeDown = round(time.time() - startTime,3)
 
 			#count total times down 24hrs, add one to count current time
@@ -100,27 +100,27 @@ while True:
 			conn.execute(insertDownTime)
 
 			conn.commit()
-			print '\n'
-			print 'Internet was down for '+str(timeDown)+' seconds!'
+			print('\n')
+			print('Internet was down for '+str(timeDown)+' seconds!')
 			tweet2send = 'Hey begining at '+str(convepoch(startTime))+' our internet was down for '+str(timeDown)+' seconds! Internet has dropped '+downTotal+' times in 24hrs!'
-			print '\n'
+			print('\n')
 		downCount = 0
-	except Exception,e:
-		if testOut == True: print str(e)
+	except:
+		#if testOut == True: print(str(e))
 		downCount+=1
 
-		if downCount == 1: print '\n'
+		if downCount == 1: print('\n')
 
 		#converting seconds to proper time value for terminal output
 		if downCount <= 60:
 			downTime = str(downCount*2)+' Seconds!'
 		elif downCount > 60 and downCount < 3600:
-			downTime = str(round(downCount*2/60,2))+' Minutes!'
+			downTime = str(round(float(downCount)*2/60,2))+' Minutes!'
 		elif downCount >= 3600:	
-			downTime = str(round(downCount*2/3600,2))+' Hours!'
+			downTime = str(round(float(downCount)*2/3600,2))+' Hours!'
 
 		upCount = 0
-		print 'Internet is down!!!! and has been down '+downTime
+		print('Internet is down!!!! and has been down '+downTime)
 	if downCount==5:
 		startTime=time.time()
 
